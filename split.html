@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Split Column Buttons</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: row;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Left Column */
+    .left-column {
+      flex: 1;
+      background-color: #f0f8ff; /* Light Blue Background */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .left-column .progress-button {
+      background-color: #007bff; /* Blue Button */
+    }
+
+    /* Right Column */
+    .right-column {
+      flex: 1;
+      background-color: #fff5e6; /* Light Orange Background */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .right-column .progress-button {
+      background-color: #ffa500; /* Orange Button */
+    }
+
+    /* Button Container */
+    .button-container {
+      position: relative;
+      width: 200px;
+      height: 50px;
+      margin-bottom: 20px;
+    }
+
+    .progress-button {
+      position: relative;
+      display: flex;
+      justify-content: flex-start; /* Align text to the left */
+      align-items: center;
+      padding-left: 15px; /* Add padding for text */
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 0%;
+      background-color: rgba(255, 255, 255, 0.5); /* Semi-transparent White */
+      z-index: 0; /* Ensure it stays behind the text */
+      transition: width 0.1s linear;
+    }
+
+    .progress-button span {
+      position: relative;
+      z-index: 1; /* Place text above the progress bar */
+    }
+
+    .download-container {
+      text-align: center;
+    }
+
+    .download-button {
+      padding: 10px 20px;
+      font-size: 14px;
+      color: white;
+      background-color: #28a745; /* Green */
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <!-- Left Column -->
+  <div class="left-column">
+    <div class="button-container">
+      <button id="progressButtonLeft" class="progress-button">
+        <div id="progressBarLeft" class="progress-bar"></div>
+        <span>Left Button</span>
+      </button>
+    </div>
+    <div class="download-container">
+      <button id="downloadButtonLeft" class="download-button">Download Left Log</button>
+    </div>
+  </div>
+
+  <!-- Right Column -->
+  <div class="right-column">
+    <div class="button-container">
+      <button id="progressButtonRight" class="progress-button">
+        <div id="progressBarRight" class="progress-bar"></div>
+        <span>Right Button</span>
+      </button>
+    </div>
+    <div class="download-container">
+      <button id="downloadButtonRight" class="download-button">Download Right Log</button>
+    </div>
+  </div>
+
+  <script>
+    const maxTime = 10; // Maximum time in seconds
+
+    // Log data for left and right buttons
+    const logDataLeft = JSON.parse(localStorage.getItem("logDataLeft")) || [];
+    const logDataRight = JSON.parse(localStorage.getItem("logDataRight")) || [];
+
+    // Functions to handle button events
+    function handleProgress(buttonId, progressBarId, storageKey, logData) {
+      const progressButton = document.getElementById(buttonId);
+      const progressBar = document.getElementById(progressBarId);
+      let timeSinceLastClick = 0;
+      let interval;
+
+      // Restore progress bar width on page load
+      const progressWidth = parseFloat(localStorage.getItem(`${storageKey}ProgressWidth`)) || 0;
+      progressBar.style.width = `${progressWidth}%`;
+
+      function startProgress() {
+        clearInterval(interval); // Reset the interval if already running
+        timeSinceLastClick = 0;
+        progressBar.style.width = "0%";
+
+        interval = setInterval(() => {
+          timeSinceLastClick += 0.1;
+          const progressPercentage = (timeSinceLastClick / maxTime) * 100;
+          progressBar.style.width = `${progressPercentage}%`;
+
+          // Save progress width to localStorage
+          localStorage.setItem(`${storageKey}ProgressWidth`, progressPercentage);
+
+          if (timeSinceLastClick >= maxTime) {
+            clearInterval(interval);
+            progressBar.style.width = "100%"; // Ensure full width at max time
+            localStorage.setItem(`${storageKey}ProgressWidth`, 100);
+          }
+        }, 100); // Update every 100ms for smooth progress
+      }
+
+      function logClickEvent() {
+        const buttonText = progressButton.textContent.trim();
+        const date = new Date().toLocaleDateString(); // Current date only
+        logData.push({ buttonText, date }); // Add log entry to the array
+        localStorage.setItem(storageKey, JSON.stringify(logData)); // Save log to localStorage
+      }
+
+      progressButton.addEventListener("click", () => {
+        startProgress();
+        logClickEvent();
+      });
+    }
+
+    // Handle CSV download
+    function handleDownload(downloadButtonId, storageKey, logData) {
+      const downloadButton = document.getElementById(downloadButtonId);
+      downloadButton.addEventListener("click", () => {
+        if (logData.length === 0) {
+          alert("No log data available.");
+          return;
+        }
+
+        const csvContent = [
+          ["Button Text", "Date"], // Header row
+          ...logData.map(row => [row.buttonText, row.date])
+        ]
+          .map(e => e.join(",")) // Join fields with commas
+          .join("\n"); // Join rows with newlines
+
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `${storageKey}_log.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      });
+    }
+
+    // Initialize left and right buttons
+    handleProgress("progressButtonLeft", "progressBarLeft", "logDataLeft", logDataLeft);
+    handleProgress("progressButtonRight", "progressBarRight", "logDataRight", logDataRight);
+    handleDownload("downloadButtonLeft", "logDataLeft", logDataLeft);
+    handleDownload("downloadButtonRight", "logDataRight", logDataRight);
+  </script>
+</body>
+</html>
+
