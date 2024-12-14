@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Persistent Pie Chart and Circle Buttons</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      background-color: black;
+    }
+
+    .pie-container {
+      position: relative;
+      width: 350px;
+      height: 350px;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+
+    /* Pie Chart SVG */
+    #pieChart {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 350px;
+      height: 350px;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Circle Buttons */
+    .circle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 300px;
+      height: 300px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .circle a {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #ddd;
+      user-select: none;
+      cursor: pointer;
+    }
+
+    .top-half {
+      background-color: #6e4a03;
+    }
+
+    .bottom-half {
+      background-color: #135066;
+    }
+
+    .circle a:hover {
+      text-decoration: underline;
+    }
+
+    /* Time Bar */
+    .time-bar-container {
+      width: 100%;
+      max-width: 350px;
+      height: 25px;
+      margin-top: 25px;
+      background-color: #ddd;
+    }
+
+    .time-bar {
+      height: 100%;
+      width: 0;
+      background-color: #555;
+      transition: width 0.5s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="pie-container">
+    <svg id="pieChart" viewBox="0 0 32 32"></svg>
+    <div class="circle">
+      <a href="#" class="top-half" id="increaseLeft">Ryan</a>
+      <a href="#" class="bottom-half" id="increaseRight">Finley</a>
+    </div>
+  </div>
+  <div class="time-bar-container">
+    <div class="time-bar" id="timeBar"></div>
+  </div>
+
+  <script>
+    // Load values from localStorage or set defaults
+    let leftValue = parseInt(localStorage.getItem('leftValue')) || 1;
+    let rightValue = parseInt(localStorage.getItem('rightValue')) || 1;
+    let lastPressTime = parseInt(localStorage.getItem('lastPressTime')) || Date.now();
+    const maxTime = 30; // Time in seconds for the bar to fill up completely (for testing)
+
+    function renderPieChart() {
+      const total = leftValue + rightValue;
+      const leftPercentage = (leftValue / total) * 100;
+
+      const svg = document.getElementById('pieChart');
+      svg.innerHTML = `
+        <circle r="16" cx="16" cy="16" fill="#1a7291" stroke="#966402" stroke-dasharray="${leftPercentage} ${100 - leftPercentage}" stroke-dashoffset="25" stroke-width="32"/>
+      `;
+
+      // Save the current state to localStorage
+      localStorage.setItem('leftValue', leftValue);
+      localStorage.setItem('rightValue', rightValue);
+    }
+
+    function updateTimeBar() {
+      const now = Date.now();
+      const elapsedSeconds = Math.floor((now - lastPressTime) / 1000);
+      const percentage = Math.min((elapsedSeconds / maxTime) * 100, 100);
+
+      const timeBar = document.getElementById('timeBar');
+      timeBar.style.width = `${percentage}%`;
+    }
+
+    document.getElementById('increaseLeft').addEventListener('click', (e) => {
+      e.preventDefault();
+      leftValue += 1;
+      lastPressTime = Date.now();
+      localStorage.setItem('lastPressTime', lastPressTime);
+      renderPieChart();
+      updateTimeBar();
+    });
+
+    document.getElementById('increaseRight').addEventListener('click', (e) => {
+      e.preventDefault();
+      rightValue += 1;
+      lastPressTime = Date.now();
+      localStorage.setItem('lastPressTime', lastPressTime);
+      renderPieChart();
+      updateTimeBar();
+    });
+
+    // Update the bar periodically
+    setInterval(updateTimeBar, 500);
+
+    // Initial Render
+    renderPieChart();
+    updateTimeBar();
+  </script>
+</body>
+</html>
+
