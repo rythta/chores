@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chore Tracker</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: black;
+      color: #ddd;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .chore-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 40px;
+      max-width: 800px;
+      width: 100%;
+    }
+
+    .chore-card {
+      background: #222;
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .chore-inputs {
+      margin-bottom: 20px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .chore-inputs input {
+      margin: 5px 0;
+      width: 80%;
+      padding: 5px;
+      border-radius: 5px;
+      border: none;
+      font-size: 1rem;
+    }
+
+    .pie-container {
+      position: relative;
+      width: 250px;
+      height: 250px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .pie-container svg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 250px;
+      height: 250px;
+      transform: translate(-50%, -50%);
+    }
+
+    .circle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 200px;
+      height: 200px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .circle a {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: bold;
+      color: #ddd;
+      user-select: none;
+      cursor: pointer;
+    }
+
+    .top-half {
+      background-color: #6e4a03;
+    }
+
+    .bottom-half {
+      background-color: #135066;
+    }
+
+    .circle a:hover {
+      text-decoration: underline;
+    }
+
+    .time-bar-container {
+      width: 100%;
+      max-width: 250px;
+      height: 20px;
+      margin-top: 15px;
+      background-color: #ddd;
+    }
+
+    .time-bar {
+      height: 100%;
+      width: 0;
+      background-color: #555;
+      transition: width 0.5s ease;
+    }
+
+    .download-btn {
+      margin-top: 40px;
+      padding: 10px 20px;
+      background: #444;
+      border: none;
+      border-radius: 5px;
+      color: #ddd;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .download-btn:hover {
+      background: #666;
+    }
+
+  </style>
+</head>
+<body>
+  <h1>Chore Tracker</h1>
+  <div class="chore-grid">
+    <!-- Example: Four chores in a grid -->
+    <div class="chore-card">
+      <div class="chore-inputs">
+        <input type="text" class="chore-title" placeholder="Chore Title" data-chore="chore1" />
+        <input type="number" class="chore-frequency" placeholder="Frequency (seconds)" data-chore="chore1" />
+      </div>
+      <div class="pie-container" data-chore="chore1">
+        <svg viewBox="0 0 32 32"></svg>
+        <div class="circle">
+          <a href="#" class="top-half increment-left" data-chore="chore1">Ryan</a>
+          <a href="#" class="bottom-half increment-right" data-chore="chore1">Finley</a>
+        </div>
+      </div>
+      <div class="time-bar-container">
+        <div class="time-bar" data-chore="chore1"></div>
+      </div>
+    </div>
+
+    <div class="chore-card">
+      <div class="chore-inputs">
+        <input type="text" class="chore-title" placeholder="Chore Title" data-chore="chore2" />
+        <input type="number" class="chore-frequency" placeholder="Frequency (seconds)" data-chore="chore2" />
+      </div>
+      <div class="pie-container" data-chore="chore2">
+        <svg viewBox="0 0 32 32"></svg>
+        <div class="circle">
+          <a href="#" class="top-half increment-left" data-chore="chore2">Ryan</a>
+          <a href="#" class="bottom-half increment-right" data-chore="chore2">Finley</a>
+        </div>
+      </div>
+      <div class="time-bar-container">
+        <div class="time-bar" data-chore="chore2"></div>
+      </div>
+    </div>
+
+    <div class="chore-card">
+      <div class="chore-inputs">
+        <input type="text" class="chore-title" placeholder="Chore Title" data-chore="chore3" />
+        <input type="number" class="chore-frequency" placeholder="Frequency (seconds)" data-chore="chore3" />
+      </div>
+      <div class="pie-container" data-chore="chore3">
+        <svg viewBox="0 0 32 32"></svg>
+        <div class="circle">
+          <a href="#" class="top-half increment-left" data-chore="chore3">Ryan</a>
+          <a href="#" class="bottom-half increment-right" data-chore="chore3">Finley</a>
+        </div>
+      </div>
+      <div class="time-bar-container">
+        <div class="time-bar" data-chore="chore3"></div>
+      </div>
+    </div>
+
+    <div class="chore-card">
+      <div class="chore-inputs">
+        <input type="text" class="chore-title" placeholder="Chore Title" data-chore="chore4" />
+        <input type="number" class="chore-frequency" placeholder="Frequency (seconds)" data-chore="chore4" />
+      </div>
+      <div class="pie-container" data-chore="chore4">
+        <svg viewBox="0 0 32 32"></svg>
+        <div class="circle">
+          <a href="#" class="top-half increment-left" data-chore="chore4">Ryan</a>
+          <a href="#" class="bottom-half increment-right" data-chore="chore4">Finley</a>
+        </div>
+      </div>
+      <div class="time-bar-container">
+        <div class="time-bar" data-chore="chore4"></div>
+      </div>
+    </div>
+  </div>
+
+  <button class="download-btn" id="downloadCsvBtn">Download CSV</button>
+
+  <script>
+    // We will track all completions in a global array saved to localStorage.
+    // Format: { chore: 'chore1', title: 'Dishes', person: 'Ryan', timestamp: '...' }
+    let completions = JSON.parse(localStorage.getItem('completions')) || [];
+
+    // List of chore IDs we have
+    const chores = ['chore1','chore2','chore3','chore4'];
+
+    // Load initial values and set up event listeners
+    chores.forEach(choreId => {
+      initChore(choreId);
+    });
+
+    // Initialize a chore's state and event handlers
+    function initChore(choreId) {
+      let leftValue = parseInt(localStorage.getItem(choreId + '_leftValue')) || 1;
+      let rightValue = parseInt(localStorage.getItem(choreId + '_rightValue')) || 1;
+      let lastPressTime = parseInt(localStorage.getItem(choreId + '_lastPressTime')) || Date.now();
+      let frequency = parseInt(localStorage.getItem(choreId + '_frequency')) || 30; // default frequency
+      let title = localStorage.getItem(choreId + '_title') || 'Chore';
+
+      // Set up inputs
+      const titleInput = document.querySelector('.chore-title[data-chore="'+choreId+'"]');
+      const freqInput = document.querySelector('.chore-frequency[data-chore="'+choreId+'"]');
+
+      if (titleInput) {
+        titleInput.value = title;
+        titleInput.addEventListener('input', () => {
+          localStorage.setItem(choreId + '_title', titleInput.value);
+        });
+      }
+
+      if (freqInput) {
+        freqInput.value = frequency;
+        freqInput.addEventListener('input', () => {
+          const val = parseInt(freqInput.value) || 30;
+          localStorage.setItem(choreId + '_frequency', val);
+        });
+      }
+
+      function renderPieChart() {
+        const total = leftValue + rightValue;
+        const leftPercentage = (leftValue / total) * 100;
+
+        const svg = document.querySelector('[data-chore="'+choreId+'"] svg');
+        svg.innerHTML = `
+          <circle r="16" cx="16" cy="16" fill="#1a7291" stroke="#966402" 
+            stroke-dasharray="${leftPercentage} ${100 - leftPercentage}" 
+            stroke-dashoffset="25" stroke-width="32"/>
+        `;
+
+        // Save current state
+        localStorage.setItem(choreId + '_leftValue', leftValue);
+        localStorage.setItem(choreId + '_rightValue', rightValue);
+      }
+
+      function updateTimeBar() {
+        const now = Date.now();
+        const elapsedSeconds = Math.floor((now - lastPressTime) / 1000);
+        // Re-pull frequency from storage in case changed
+        frequency = parseInt(localStorage.getItem(choreId + '_frequency')) || 30;
+        const percentage = Math.min((elapsedSeconds / frequency) * 100, 100);
+
+        const timeBar = document.querySelector('.time-bar[data-chore="'+choreId+'"]');
+        timeBar.style.width = `${percentage}%`;
+      }
+
+      function incrementPerson(person) {
+        if (person === 'left') {
+          leftValue += 1;
+        } else {
+          rightValue += 1;
+        }
+        lastPressTime = Date.now();
+        localStorage.setItem(choreId + '_lastPressTime', lastPressTime);
+        renderPieChart();
+        updateTimeBar();
+
+        // Record completion
+        const choreTitle = localStorage.getItem(choreId + '_title') || 'Chore';
+        const record = {
+          chore: choreId,
+          title: choreTitle,
+          person: (person === 'left') ? 'Ryan' : 'Finley',
+          timestamp: new Date().toISOString()
+        };
+        completions.push(record);
+        localStorage.setItem('completions', JSON.stringify(completions));
+      }
+
+      // Event listeners for increment buttons
+      const incLeft = document.querySelector('.increment-left[data-chore="'+choreId+'"]');
+      const incRight = document.querySelector('.increment-right[data-chore="'+choreId+'"]');
+      if (incLeft) {
+        incLeft.addEventListener('click', (e) => {
+          e.preventDefault();
+          incrementPerson('left');
+        });
+      }
+      if (incRight) {
+        incRight.addEventListener('click', (e) => {
+          e.preventDefault();
+          incrementPerson('right');
+        });
+      }
+
+      // Initial Render
+      renderPieChart();
+      updateTimeBar();
+
+      // Update the bar periodically
+      setInterval(updateTimeBar, 500);
+    }
+
+    // Download CSV button
+    document.getElementById('downloadCsvBtn').addEventListener('click', () => {
+      // Convert completions to CSV
+      let csv = 'ChoreID,Title,Person,Timestamp\n';
+      completions.forEach(rec => {
+        csv += `${rec.chore},${escapeCsv(rec.title)},${rec.person},${rec.timestamp}\n`;
+      });
+
+      // Create a Blob and trigger a download
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'chore_completions.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    function escapeCsv(value) {
+      if (value === null || value === undefined) return '';
+      const needsQuotes = value.includes(',') || value.includes('"') || value.includes('\n');
+      let escaped = value.replace(/"/g, '""');
+      if (needsQuotes) {
+        escaped = `"${escaped}"`;
+      }
+      return escaped;
+    }
+  </script>
+</body>
+</html>
+
