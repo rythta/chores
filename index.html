@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Persistent Number Readout</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .circle {
+      width: 20%;
+      aspect-ratio: 1;
+      position: relative;
+      border-radius: 50%;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .circle a {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: white;
+    }
+
+    .top-half {
+      background-color: #3498db; /* Blue */
+    }
+
+    .bottom-half {
+      background-color: #e74c3c; /* Red */
+    }
+
+    .circle a:hover {
+      text-decoration: underline;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="circle">
+    <a href="#" class="top-half">Top Half</a>
+    <a href="#" class="bottom-half">Bottom Half</a>
+  </div>
+</body>
+</html>
+
