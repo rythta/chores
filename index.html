@@ -7,7 +7,6 @@
    <style>
     body {
       margin: 0;
-      overflow: hidden;
       font-family: Arial, sans-serif;
     }
 
@@ -25,14 +24,42 @@
       flex-shrink: 0;
       overflow-y: hidden;
       display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Navigation Buttons at Top Right */
+    .nav-buttons {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      gap: 5px;
+      z-index: 2000;
+    }
+
+    .nav-button {
+      width: 40px;
+      height: 40px;
+      background-color: #333;
+      border: none;
+      border-radius: 5px;
+      color: #fff;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     /* Buttons Screen Layout */
-    .buttons-screen {
+    .buttons-screen-content {
       display: flex;
+      flex: 1;
       flex-direction: row;
       justify-content: space-between;
       align-items: stretch;
+      overflow: hidden;
     }
 
     .column {
@@ -46,7 +73,7 @@
       overflow-y: auto;
     }
 
-    .metrics-screen {
+    .metrics-screen-content {
 	background-color: #222;
 	color: white;
 	display: flex;
@@ -56,6 +83,7 @@
 	padding: 20px;
 	overflow-y: auto;
 	text-align: center; /* Remove center alignment */
+        flex: 1;
     }
 
     .metrics-column {
@@ -180,19 +208,31 @@
   <div class="container" id="container">
     <!-- Buttons Screen -->
     <div class="screen buttons-screen" id="buttonsScreen">
-      <div class="column" id="leftColumn"></div>
-      <div class="column" id="rightColumn"></div>
+      <div class="nav-buttons">
+        <button class="nav-button" onclick="switchScreen(-1)">&lt;</button>
+        <button class="nav-button" onclick="switchScreen(1)">&gt;</button>
+      </div>
+      <div class="buttons-screen-content">
+        <div class="column" id="leftColumn"></div>
+        <div class="column" id="rightColumn"></div>
+      </div>
     </div>
 
     <!-- Metrics Screen -->
     <div class="screen metrics-screen" id="metricsScreen">
-      <div class="metrics-column" id="metricsLeftColumn"></div>
-      <div class="metrics-column" id="metricsRightColumn">
-        <!-- Download Unified Log -->
-        <div class="download-container" id="downloadButton">
-          <svg class="download-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="M5 20h14v-2H5v2zm7-18l-7 7h4v6h6v-6h4l-7-7z"/>
-          </svg>
+      <div class="nav-buttons">
+        <button class="nav-button" onclick="switchScreen(-1)">&lt;</button>
+        <button class="nav-button" onclick="switchScreen(1)">&gt;</button>
+      </div>
+      <div class="metrics-screen-content">
+        <div class="metrics-column" id="metricsLeftColumn"></div>
+        <div class="metrics-column" id="metricsRightColumn">
+          <!-- Download Unified Log -->
+          <div class="download-container" id="downloadButton">
+            <svg class="download-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M5 20h14v-2H5v2zm7-18l-7 7h4v6h6v-6h4l-7-7z"/>
+            </svg>
+          </div>
         </div>
       </div>
     </div>
@@ -211,7 +251,7 @@
       }
     }
 
-    // Handle swipe gestures
+    // Handle swipe gestures (optional, can be removed)
     let startX = 0;
     document.addEventListener("touchstart", (e) => {
       startX = e.touches[0].clientX;
@@ -229,7 +269,7 @@
     });
 
     // Restore or initialize log data
-    const logData = JSON.parse(localStorage.getItem("eventLogDataV1")) || [];
+    const logData = JSON.parse(localStorage.getItem("eventLogDataV2")) || [];
 
     // Button configurations
     const leftColumnConfigs = [
