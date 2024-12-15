@@ -2,44 +2,31 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <!-- Prevent zooming -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0"/>
-  <title>Two Screens with Two Columns and No Swipe</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Two Screens with Buttons</title>
   <style>
-    html, body {
-      width: 100%;
-      height: 100%;
+    body, html {
       margin: 0;
       padding: 0;
-      overflow-x: hidden; /* Prevent any horizontal scroll */
+      overflow: hidden; /* No scrolling */
       font-family: Arial, sans-serif;
-      box-sizing: border-box;
-    }
-    *, *::before, *::after {
-      box-sizing: inherit;
-    }
-
-    body {
-      overflow: hidden; /* Ensure no vertical scrolling if not needed */
-    }
-
-    .container {
-      display: flex;
-      flex-direction: row;
+      height: 100%;
       width: 100%;
-      height: 100vh;
-      overflow-x: hidden;
-      transition: transform 0.3s ease-in-out;
-      transform: translateX(0%); /* Start at first screen */
     }
 
     .screen {
-      flex: 0 0 100%; /* Each screen takes full width */
+      width: 100vw;
       height: 100vh;
-      overflow: hidden;
+      overflow-y: auto;
+      display: none; /* Hide by default */
+      position: relative;
+      box-sizing: border-box;
+    }
+
+    /* Show the currently active screen */
+    .active {
       display: flex;
       flex-direction: column;
-      position: relative;
     }
 
     /* Navigation Buttons at Top Right */
@@ -92,12 +79,12 @@
       color: white;
       display: flex;
       flex-direction: row;
-      justify-content: space-between;
-      align-items: stretch;
+      justify-content: space-between; 
+      align-items: stretch; 
       padding: 20px;
       overflow-y: auto;
+      text-align: center; 
       flex: 1;
-      text-align: left;
     }
 
     .metrics-column {
@@ -197,8 +184,8 @@
       grid-template-columns: repeat(7, 1fr);
       grid-template-rows: repeat(4, 1fr);
       gap: 2px;
-      width: 140px; /* 7 columns * ~20px each */
-      height: 80px;  /* 4 rows * ~20px each */
+      width: 140px;
+      height: 80px;
       align-self: center;
       padding-left: 38%;
     }
@@ -210,7 +197,6 @@
       border-radius: 3px;
     }
 
-    /* Darker squares for more activity */
     .level-1 { background-color: #c6e48b; }
     .level-2 { background-color: #7bc96f; }
     .level-3 { background-color: #239a3b; }
@@ -218,54 +204,55 @@
   </style>
 </head>
 <body>
-  <div class="container" id="container">
-    <!-- Buttons Screen -->
-    <div class="screen buttons-screen" id="buttonsScreen">
-      <div class="nav-buttons">
-        <button class="nav-button" onclick="switchScreen(-1)">&lt;</button>
-        <button class="nav-button" onclick="switchScreen(1)">&gt;</button>
-      </div>
-      <div class="buttons-screen-content">
-        <div class="column" id="leftColumn"></div>
-        <div class="column" id="rightColumn"></div>
-      </div>
+  <!-- Buttons Screen -->
+  <div class="screen buttons-screen active" id="buttonsScreen">
+    <div class="nav-buttons">
+      <button class="nav-button" onclick="switchScreen(0)">&lt;</button>
+      <button class="nav-button" onclick="switchScreen(1)">&gt;</button>
     </div>
+    <div class="buttons-screen-content">
+      <div class="column" id="leftColumn"></div>
+      <div class="column" id="rightColumn"></div>
+    </div>
+  </div>
 
-    <!-- Metrics Screen -->
-    <div class="screen metrics-screen" id="metricsScreen">
-      <div class="nav-buttons">
-        <button class="nav-button" onclick="switchScreen(-1)">&lt;</button>
-        <button class="nav-button" onclick="switchScreen(1)">&gt;</button>
-      </div>
-      <div class="metrics-screen-content">
-        <div class="metrics-column" id="metricsLeftColumn"></div>
-        <div class="metrics-column" id="metricsRightColumn">
-          <!-- Download Unified Log -->
-          <div class="download-container" id="downloadButton">
-            <svg class="download-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-              <path d="M5 20h14v-2H5v2zm7-18l-7 7h4v6h6v-6h4l-7-7z"/>
-            </svg>
-          </div>
+  <!-- Metrics Screen -->
+  <div class="screen metrics-screen" id="metricsScreen">
+    <div class="nav-buttons">
+      <button class="nav-button" onclick="switchScreen(0)">&lt;</button>
+      <button class="nav-button" onclick="switchScreen(1)">&gt;</button>
+    </div>
+    <div class="metrics-screen-content">
+      <div class="metrics-column" id="metricsLeftColumn"></div>
+      <div class="metrics-column" id="metricsRightColumn">
+        <!-- Download Unified Log -->
+        <div class="download-container" id="downloadButton">
+          <svg class="download-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M5 20h14v-2H5v2zm7-18l-7 7h4v6h6v-6h4l-7-7z"/>
+          </svg>
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    const container = document.getElementById("container");
-    let currentScreen = 0; // Track current screen (0 = buttons, 1 = metrics)
+    let currentScreen = 0; // 0 = buttons screen, 1 = metrics screen
+    const buttonsScreen = document.getElementById('buttonsScreen');
+    const metricsScreen = document.getElementById('metricsScreen');
 
-    function switchScreen(delta) {
-      currentScreen = Math.max(0, Math.min(1, currentScreen + delta)); // Clamp between 0 and 1
-      // Use percentage-based transforms to move between screens
-      container.style.transform = `translateX(-${currentScreen * 100}%)`;
-      if (currentScreen === 1) {
-        // Update metrics when switching to metrics screen
+    function switchScreen(screenIndex) {
+      currentScreen = screenIndex;
+      if (currentScreen === 0) {
+        buttonsScreen.classList.add('active');
+        metricsScreen.classList.remove('active');
+      } else {
+        metricsScreen.classList.add('active');
+        buttonsScreen.classList.remove('active');
         updateMetrics();
       }
     }
 
-    // Removed swipe event listeners
+    // No swipe functionality, no touch event listeners.
 
     // Restore or initialize log data
     const logData = JSON.parse(localStorage.getItem("eventLogDataV1")) || [];
