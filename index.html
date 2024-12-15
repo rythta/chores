@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Organized Buttons with Compact Download</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Organized Buttons with Custom Timeout</title>
   <style>
     body {
       display: flex;
@@ -16,7 +16,7 @@
     /* Left Column */
     .left-column {
       flex: 1;
-      background-color: #f0f8ff; /* Light Blue Background */
+      background-color: #000000; /* Light Blue Background */
       display: flex;
       flex-wrap: wrap; /* Wrap buttons into rows */
       justify-content: center;
@@ -28,7 +28,7 @@
     /* Right Column */
     .right-column {
       flex: 1;
-      background-color: #fff5e6; /* Light Orange Background */
+      background-color: #000000; /* Light Orange Background */
       display: flex;
       flex-wrap: wrap; /* Wrap buttons into rows */
       justify-content: center;
@@ -67,7 +67,7 @@
       left: 0;
       height: 100%;
       width: 0%;
-      background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent White */
+      background-color: rgba(0,0,0, 0.5); /* Semi-transparent White */
       z-index: 0; /* Ensure it stays behind the text */
       transition: width 0.1s linear;
     }
@@ -116,17 +116,16 @@
 
   <!-- Download Unified Log -->
   <div class="download-container" id="downloadButton">
-    <svg class="download-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <svg class="download-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="transform: rotate(180deg);">
       <path d="M5 20h14v-2H5v2zm7-18l-7 7h4v6h6v-6h4l-7-7z"/>
     </svg>
   </div>
 
   <script>
-    const maxTime = 10; // Maximum time in seconds
     const logData = JSON.parse(localStorage.getItem("unifiedLogData")) || [];
 
     // Function to handle progress and logging for each button
-    function handleButton(buttonId, progressBarId, buttonText) {
+    function handleButton(buttonId, progressBarId, buttonText, maxTime) {
       const progressButton = document.getElementById(buttonId);
       const progressBar = document.getElementById(progressBarId);
       let timeSinceLastClick = 0;
@@ -169,11 +168,17 @@
       });
     }
 
-    // Function to create buttons dynamically
-    function createButtons(containerId, color, count) {
+    /**
+     * Function to create buttons dynamically
+     * @param {String} containerId - The ID of the container where buttons should be added.
+     * @param {String} color - The background color of the buttons.
+     * @param {Array} buttonConfigs - An array of objects, each with { text: string, maxTime: number }.
+     */
+    function createButtons(containerId, color, buttonConfigs) {
       const container = document.getElementById(containerId);
-      for (let i = 1; i <= count; i++) {
-        const buttonId = `${containerId}Button${i}`;
+      buttonConfigs.forEach((config, index) => {
+        const { text, maxTime } = config;
+        const buttonId = `${containerId}Button${index+1}`;
         const progressBarId = `${buttonId}Bar`;
 
         // Create button container
@@ -184,20 +189,43 @@
         const button = document.createElement("button");
         button.id = buttonId;
         button.className = "progress-button";
-        button.style.backgroundColor = color; // Set button color
-        button.innerHTML = `<div id="${progressBarId}" class="progress-bar"></div><span>${containerId} Button ${i}</span>`;
+        button.style.backgroundColor = color;
+        button.innerHTML = `<div id="${progressBarId}" class="progress-bar"></div><span>${text}</span>`;
 
         buttonContainer.appendChild(button);
         container.appendChild(buttonContainer);
 
         // Attach progress and logging behavior
-        handleButton(buttonId, progressBarId, `${containerId} Button ${i}`);
-      }
+        handleButton(buttonId, progressBarId, text, maxTime);
+      });
     }
 
-    // Create multiple buttons for left and right columns
-    createButtons("leftColumn", "#007bff", 10); // Left column: Blue buttons
-    createButtons("rightColumn", "#ffa500", 10); // Right column: Orange buttons
+    // Example usage:
+    // Here we define each button with its own text and maxTime (in seconds).
+    const leftColumnConfigs = [
+	{ text: "Mop", maxTime: 5 },
+	{ text: "Vacuum", maxTime: 8 },
+	{ text: "Microwave", maxTime: 10 },
+	{ text: "Trash", maxTime: 10 },
+	{ text: "Dishwasher", maxTime: 10 },
+	{ text: "Light kitchen tidy", maxTime: 10 },
+	{ text: "Light house tidy", maxTime: 10 }
+    ];
+
+    const rightColumnConfigs = [
+	{ text: "Dust", maxTime: 3 },
+	{ text: "Wipe", maxTime: 15 },
+	{ text: "Stove", maxTime: 20 },
+	{ text: "Sink", maxTime: 10 },
+	{ text: "Jo", maxTime: 10 },
+	{ text: "Laundry Room", maxTime: 10 },
+	{ text: "Light kitchen tidy", maxTime: 10 },
+	{ text: "Light house tidy", maxTime: 10 }
+    ];
+
+    // Create buttons for each column with custom texts and maxTimes
+    createButtons("leftColumn", "#ffbc57", leftColumnConfigs);
+    createButtons("rightColumn", "#6673ff", rightColumnConfigs);
 
     // Handle CSV download for unified log
     const downloadButton = document.getElementById("downloadButton");
@@ -211,8 +239,8 @@
         ["Button Text", "Date"], // Header row
         ...logData.map(row => [row.buttonText, row.date])
       ]
-        .map(e => e.join(",")) // Join fields with commas
-        .join("\n"); // Join rows with newlines
+      .map(e => e.join(",")) // Join fields with commas
+      .join("\n"); // Join rows with newlines
 
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
