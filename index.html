@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Two Screens with Two Columns and Swipe</title>
-  <style>
+   <style>
     body {
       margin: 0;
       overflow: hidden;
@@ -182,18 +182,14 @@
 
     <!-- Metrics Screen -->
     <div class="screen metrics-screen" id="metricsScreen">
-      <div class="metrics-column" id="metricsLeftColumn">
-        <!-- Left half of the buttons' activity logs will be placed here -->
-      </div>
+      <div class="metrics-column" id="metricsLeftColumn"></div>
       <div class="metrics-column" id="metricsRightColumn">
-        <!-- Right half of the buttons' activity logs will be placed here -->
-
         <!-- Download Unified Log -->
-	<div class="download-container" id="downloadButton">
-	  <svg class="download-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-	    <path d="M5 20h14v-2H5v2zm7-18l-7 7h4v6h6v-6h4l-7-7z"/>
-	  </svg>
-	</div>
+        <div class="download-container" id="downloadButton">
+          <svg class="download-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M5 20h14v-2H5v2zm7-18l-7 7h4v6h6v-6h4l-7-7z"/>
+          </svg>
+        </div>
       </div>
     </div>
   </div>
@@ -230,6 +226,28 @@
 
     // Restore or initialize log data
     const logData = JSON.parse(localStorage.getItem("eventLogDataV1")) || [];
+
+    // Button configurations
+    const leftColumnConfigs = [
+      { text: "Mop", maxTime: 604800 },
+      { text: "Vacuum", maxTime: 604800 },
+      { text: "Microwave", maxTime: 604800 },
+      { text: "Trash", maxTime: 86400 },
+      { text: "Dishwasher", maxTime: 86400 },
+      { text: "Light Kitchen Tidy", maxTime: 86400 },
+      { text: "Light House Tidy", maxTime: 86400 }
+    ];
+
+    const rightColumnConfigs = [
+      { text: "Dust", maxTime: 604800 },
+      { text: "Wipe", maxTime: 604800 },
+      { text: "Stove", maxTime: 604800 },
+      { text: "Sink", maxTime: 604800 },
+      { text: "Jo", maxTime: 604800 },
+      { text: "Laundry Room", maxTime: 604800 },
+      { text: "Light Kitchen Tidy", maxTime: 86400 },
+      { text: "Light House Tidy", maxTime: 86400 }
+    ];
 
     // Function to handle progress and logging for each button
     function handleButton(buttonId, progressBarId, buttonText, maxTime) {
@@ -275,28 +293,6 @@
       });
     }
 
-      const leftColumnConfigs = [
-      { text: "Mop", maxTime: 604800 },
-      { text: "Vacuum", maxTime: 604800 },
-      { text: "Microwave", maxTime: 604800 },
-      { text: "Trash", maxTime: 86400 },
-      { text: "Dishwasher", maxTime: 86400 },
-      { text: "Light Kitchen Tidy", maxTime: 86400 },
-      { text: "Light House Tidy", maxTime: 86400 }
-      ];
-
-      const rightColumnConfigs = [
-      { text: "Dust", maxTime: 604800 },
-      { text: "Wipe", maxTime: 604800 },
-      { text: "Stove", maxTime: 604800 },
-      { text: "Sink", maxTime: 604800 },
-      { text: "Jo", maxTime: 604800 },
-      { text: "Laundry Room", maxTime: 604800 },
-      { text: "Light Kitchen Tidy", maxTime: 86400 },
-      { text: "Light House Tidy", maxTime: 86400 }
-      ];
-
-    // Initialize buttons on main screen
     function createButtons(containerId, color, buttonConfigs) {
       const container = document.getElementById(containerId);
       buttonConfigs.forEach((config, index) => {
@@ -349,12 +345,7 @@
       document.body.removeChild(link);
     });
 
-    // Metrics Page: Show each button's 28-day commit-style chart
-    // We'll show all 8 buttons in two columns on the metrics page.
-    // The first 4 go in metricsLeftColumn, the next 4 go in metricsRightColumn.
-
-    const allButtons = [...leftColumnConfigs, ...rightColumnConfigs];
-
+    // Metrics Page
     function getLastNDates(n) {
       const dates = [];
       const now = new Date();
@@ -421,12 +412,8 @@
         }
       });
 
-      // Split buttons into two halves
-      const leftButtons = allButtons.slice(0,4);
-      const rightButtons = allButtons.slice(4);
-
-      // Render left column charts
-      leftButtons.forEach(btn => {
+      // Render left column charts (same buttons as main left column)
+      leftColumnConfigs.forEach(btn => {
         const section = document.createElement('div');
         section.className = 'metrics-button-section';
         const title = document.createElement('h2');
@@ -437,14 +424,14 @@
         leftMetricsCol.appendChild(section);
       });
 
-      // Render right column charts (above the download button)
-      // Move the download container temporarily to bottom after charts
+      // Temporarily remove download container if present
       const downloadContainer = rightMetricsCol.querySelector('.download-container');
       if (downloadContainer) {
         downloadContainer.remove();
       }
 
-      rightButtons.forEach(btn => {
+      // Render right column charts (same buttons as main right column)
+      rightColumnConfigs.forEach(btn => {
         const section = document.createElement('div');
         section.className = 'metrics-button-section';
         const title = document.createElement('h2');
@@ -460,7 +447,6 @@
         rightMetricsCol.appendChild(downloadContainer);
       }
     }
-
   </script>
 </body>
 </html>
