@@ -3,32 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Two Screens with Two Columns and Swipe</title>
-   <style>
-    body {
+  <title>Toggle Between Two Screens</title>
+  <style>
+    body, html {
       margin: 0;
+      padding: 0;
+      overflow: hidden; /* No scrolling */
       font-family: Arial, sans-serif;
-    }
-
-    .container {
-      display: flex;
-      flex-direction: row;
-      width: 200vw; /* 2 times the viewport width */
-      height: 100vh;
-      transition: transform 0.3s ease-in-out;
+      height: 100%;
+      width: 100%;
     }
 
     .screen {
       width: 100vw;
       height: 100vh;
-      flex-shrink: 0;
-      overflow-y: hidden;
-      display: flex;
-      flex-direction: column;
+      overflow-y: auto;
+      display: none; /* Hide by default */
       position: relative;
+      box-sizing: border-box;
     }
 
-    /* Navigation Buttons at Top Right */
+    /* Show the currently active screen */
+    .active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Navigation Button at Top Right */
     .nav-buttons {
       position: absolute;
       top: 10px;
@@ -39,7 +40,7 @@
     }
 
     .nav-button {
-      width: 40px;
+      width: 50px;
       height: 40px;
       background-color: #333;
       border: none;
@@ -74,39 +75,39 @@
     }
 
     .metrics-screen-content {
-	background-color: #222;
-	color: white;
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between; /* Keep columns separated evenly */
-	align-items: stretch; /* Align items at the top */
-	padding: 20px;
-	overflow-y: auto;
-	text-align: center; /* Remove center alignment */
-        flex: 1;
+      background-color: #222;
+      color: white;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between; 
+      align-items: stretch; 
+      padding: 20px;
+      overflow-y: auto;
+      text-align: center; 
+      flex: 1;
     }
 
     .metrics-column {
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-	align-items: strech; /* Align each section at the left */
-	overflow-y: auto;
-	padding: 10px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      overflow-y: auto;
+      padding: 10px;
     }
 
     .metrics-button-section {
-	margin-bottom: 30px;
-	width: 100%; /* Ensure each section spans the full column width */
-	align-self: center;
+      margin-bottom: 30px;
+      width: 100%;
+      align-self: center;
     }
 
     .metrics-button-title {
-	margin: 0;
-	margin-bottom: 10px;
-	font-weight: normal;
-	font-size: 24px;
-	text-align: center; /* Titles align left */
+      margin: 0;
+      margin-bottom: 10px;
+      font-weight: normal;
+      font-size: 24px;
+      text-align: center;
     }
 
     /* Button Styling on Main Screen */
@@ -149,45 +150,44 @@
       z-index: 1;
     }
 
-
     /* Download Button as Small Circle on Bottom Right */
     .download-container {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    background-color: #28a745; /* Green */
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-    transition: background-color 0.3s;
-    z-index: 1000; /* Ensure it stays above other elements */
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      background-color: #28a745; /* Green */
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s;
+      z-index: 1000;
     }
 
     .download-container:hover {
-    background-color: #218838;
+      background-color: #218838;
     }
 
     .download-icon {
-    width: 24px;
-    height: 24px;
-    fill: white;
-    transform: rotate(180deg); /* Flip the symbol */
+      width: 24px;
+      height: 24px;
+      fill: white;
+      transform: rotate(180deg); /* Flip the symbol */
     }
 
     .commit-chart {
-	display: grid;
-	grid-template-columns: repeat(7, 1fr);
-	grid-template-rows: repeat(4, 1fr);
-	gap: 2px;
-	width: 140px; /* 7 columns * ~20px each */
-	height: 80px;  /* 4 rows * ~20px each */
-	align-self: center;
-	padding-left: 38%;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+      gap: 2px;
+      width: 140px;
+      height: 80px;
+      align-self: center;
+      padding-left: 38%;
     }
 
     .commit-square {
@@ -197,7 +197,6 @@
       border-radius: 3px;
     }
 
-    /* Darker squares for more activity */
     .level-1 { background-color: #c6e48b; }
     .level-2 { background-color: #7bc96f; }
     .level-3 { background-color: #239a3b; }
@@ -205,71 +204,56 @@
   </style>
 </head>
 <body>
-  <div class="container" id="container">
-    <!-- Buttons Screen -->
-    <div class="screen buttons-screen" id="buttonsScreen">
-      <div class="nav-buttons">
-        <button class="nav-button" onclick="switchScreen(-1)">&lt;</button>
-        <button class="nav-button" onclick="switchScreen(1)">&gt;</button>
-      </div>
-      <div class="buttons-screen-content">
-        <div class="column" id="leftColumn"></div>
-        <div class="column" id="rightColumn"></div>
-      </div>
+  <!-- Buttons Screen -->
+  <div class="screen buttons-screen active" id="buttonsScreen">
+    <div class="nav-buttons">
+      <!-- Single button to toggle screens -->
+      <button class="nav-button" onclick="toggleScreen()">&lt;-&gt;</button>
     </div>
+    <div class="buttons-screen-content">
+      <div class="column" id="leftColumn"></div>
+      <div class="column" id="rightColumn"></div>
+    </div>
+  </div>
 
-    <!-- Metrics Screen -->
-    <div class="screen metrics-screen" id="metricsScreen">
-      <div class="nav-buttons">
-        <button class="nav-button" onclick="switchScreen(-1)">&lt;</button>
-        <button class="nav-button" onclick="switchScreen(1)">&gt;</button>
-      </div>
-      <div class="metrics-screen-content">
-        <div class="metrics-column" id="metricsLeftColumn"></div>
-        <div class="metrics-column" id="metricsRightColumn">
-          <!-- Download Unified Log -->
-          <div class="download-container" id="downloadButton">
-            <svg class="download-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-              <path d="M5 20h14v-2H5v2zm7-18l-7 7h4v6h6v-6h4l-7-7z"/>
-            </svg>
-          </div>
+  <!-- Metrics Screen -->
+  <div class="screen metrics-screen" id="metricsScreen">
+    <div class="nav-buttons">
+      <!-- Same single button here -->
+      <button class="nav-button" onclick="toggleScreen()">&lt;-&gt;</button>
+    </div>
+    <div class="metrics-screen-content">
+      <div class="metrics-column" id="metricsLeftColumn"></div>
+      <div class="metrics-column" id="metricsRightColumn">
+        <!-- Download Unified Log -->
+        <div class="download-container" id="downloadButton">
+          <svg class="download-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M5 20h14v-2H5v2zm7-18l-7 7h4v6h6v-6h4l-7-7z"/>
+          </svg>
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    const container = document.getElementById("container");
-    let currentScreen = 0; // Track current screen (0 = buttons, 1 = metrics)
+    let currentScreen = 0; // 0 = buttons screen, 1 = metrics screen
+    const buttonsScreen = document.getElementById('buttonsScreen');
+    const metricsScreen = document.getElementById('metricsScreen');
 
-    function switchScreen(delta) {
-      currentScreen = Math.max(0, Math.min(1, currentScreen + delta)); // Clamp between 0 and 1
-      container.style.transform = `translateX(-${currentScreen * 100}vw)`;
-      if (currentScreen === 1) {
-        // Update metrics when switching to metrics screen
+    function toggleScreen() {
+      currentScreen = currentScreen === 0 ? 1 : 0;
+      if (currentScreen === 0) {
+        buttonsScreen.classList.add('active');
+        metricsScreen.classList.remove('active');
+      } else {
+        metricsScreen.classList.add('active');
+        buttonsScreen.classList.remove('active');
         updateMetrics();
       }
     }
 
-    // Handle swipe gestures (optional, can be removed)
-    let startX = 0;
-    document.addEventListener("touchstart", (e) => {
-      startX = e.touches[0].clientX;
-    });
-
-    document.addEventListener("touchend", (e) => {
-      const endX = e.changedTouches[0].clientX;
-      const delta = endX - startX;
-
-      if (delta > 50) {
-        switchScreen(-1); // Swipe right
-      } else if (delta < -50) {
-        switchScreen(1); // Swipe left
-      }
-    });
-
     // Restore or initialize log data
-    const logData = JSON.parse(localStorage.getItem("eventLogDataV2")) || [];
+    const logData = JSON.parse(localStorage.getItem("eventLogDataV1")) || [];
 
     // Button configurations
     const leftColumnConfigs = [
@@ -293,7 +277,6 @@
       { text: "Light House Tidy", maxTime: 86400 }
     ];
 
-    // Function to handle progress and logging for each button
     function handleButton(buttonId, progressBarId, buttonText, maxTime) {
       const progressButton = document.getElementById(buttonId);
       const progressBar = document.getElementById(progressBarId);
